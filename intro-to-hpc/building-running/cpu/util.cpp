@@ -10,5 +10,5 @@ void print_hello()
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Get_processor_name(hostname, &result_len);
 
-    printf("Hello world from task %d of %d in host %s\n", rank, ntasks, hostname);
+    printf("Hello Nuuksio from task %d of %d in host %s\n", rank, ntasks, hostname);
 }
