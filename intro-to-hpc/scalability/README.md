@@ -21,11 +21,11 @@ sbatch --job-name=n16 --nodes=2 --ntasks-per-node=8 --gpus-per-node=8 job.sh
 
 | GCDs | Runtime (s) | Resource cost (GCD-s) | Time spent in communication (s) | Time spent in computing (s) | Speedup | Parallel efficiency |
 | ---: | ----------: | --------------------: | ------------------------------: | --------------------------: | ------: | ------------------: |
-|   1  |             |                       |                                 |                             |         |                     |
-|   2  |             |                       |                                 |                             |         |                     |
-|   4  |             |                       |                                 |                             |         |                     |
-|   8  |             |                       |                                 |                             |         |                     |
-|  16  |             |                       |                                 |                             |         |                     |
+|   1  |   9.508608  |                    1  |                       0.004219  |                    9.313464 |       1 |                100  |
+|   2  |   4.994036  |                    2  |                       0.119758  |                    4.733363 |     1.9 |               95.20 |
+|   4  |    |                    4  |                        |                     |      |                |
+|   8  |    1.626895 |                    8  |                       0.293118  |                    1.262229 |     5.8 |               73.05 |
+|  16  |    |                   16  |                        |                     |      |                |
 
 
 Speedup $S$ and efficiency $E$ are defined as
