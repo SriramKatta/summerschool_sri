@@ -53,6 +53,9 @@ int main(int argc, char *argv[]) {
         const int sourceRank = 1;
 
         // ... your code here ...
+        MPI_Status status;
+        MPI_Probe(sourceRank, tag, MPI_COMM_WORLD, status);
+        receiveBuffer.resize(status.count);
 
         // Receive the message. Will error with MPI_ERR_TRUNCATE if the buffer is too small for the incoming message
         MPI_Recv(receiveBuffer.data(), receiveBuffer.size(), MPI_INT,
