@@ -22,24 +22,15 @@ void exchange(Field &field, const ParallelData parallel)
   // Send to up, receive from down
   double *sbuf = field.temperature.data(domtop, 0);
   double *rbuf = field.temperature.data(bot, 0);
-  if(parallel.rank %2 == 0){
-    MPI_Send(sbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
-    MPI_Recv(rbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
-  }else{
-    MPI_Recv(rbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
-    MPI_Send(sbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
-  }
-
+  MPI_Sendrecv(sbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 0,
+                 rbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
+  
   // Send to down, receive from up
   sbuf = field.temperature.data(dombot, 0);
   rbuf = field.temperature.data(top, 0);
-  if(parallel.rank%2 == 0){
-    MPI_Send(sbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 1, MPI_COMM_WORLD);
-    MPI_Recv(rbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 1, MPI_COMM_WORLD, &status[0]);
-  }else{
-    MPI_Recv(rbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 1, MPI_COMM_WORLD, &status[0]);
-    MPI_Send(sbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 1, MPI_COMM_WORLD);
-  }
+  MPI_Sendrecv(sbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 1, 
+             rbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 1, MPI_COMM_WORLD, &status[0]);
+  
 
 
   // TODO end
