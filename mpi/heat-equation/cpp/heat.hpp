@@ -23,12 +23,12 @@ struct ParallelData {
 
       nup = rank - 1;
       ndown = rank + 1;
-      if(0 == rank){
-        ndown = MPI_PROC_NULL;
-      }
-      if ((size-1) == rank)
-      {
+      if(nup < 0){
         nup = MPI_PROC_NULL;
+      }
+      if (ndown > (size -1))
+      {
+        ndown = MPI_PROC_NULL;
       }
       
       // TODO end
