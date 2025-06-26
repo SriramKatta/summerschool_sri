@@ -21,8 +21,8 @@ struct ParallelData {
       // them in nup and ndown attributes, remember to cope with
       // boundary domains appropriatly
 
-      nup = rank + 1;
-      ndown = rank -1;
+      nup = rank - 1;
+      ndown = rank + 1;
       if(0 == rank){
         ndown = MPI_PROC_NULL;
       }
