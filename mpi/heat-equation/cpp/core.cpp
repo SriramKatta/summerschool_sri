@@ -20,8 +20,8 @@ void exchange(Field &field, const ParallelData parallel)
   // You can utilize the data() method of the Matrix class to obtain pointer
   // to element, e.g. field.temperature.data(i, j)
   // Send to up, receive from down
-  double *sbuf = field.temperature.data(domtop, 0);
-  double *rbuf = field.temperature.data(bot, 0);
+  double *sbuf = field.temperature.data(dombot, 0);
+  double *rbuf = field.temperature.data(top, 0);
   if (parallel.rank % 2 == 0)
   {
     MPI_Send(sbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
@@ -34,8 +34,8 @@ void exchange(Field &field, const ParallelData parallel)
   }
 
   // Send to down, receive from up
-  sbuf = field.temperature.data(dombot, 0);
-  rbuf = field.temperature.data(top, 0);
+  sbuf = field.temperature.data(domtop, 0);
+  rbuf = field.temperature.data(bot, 0);
   if (parallel.rank % 2 == 0)
   {
     MPI_Send(sbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
