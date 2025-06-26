@@ -5,26 +5,53 @@
 #include "heat.hpp"
 
 // Exchange the boundary values
-void exchange(Field& field, const ParallelData parallel)
+void exchange(Field &field, const ParallelData parallel)
 {
+  MPI_Status status[2];
 
-    double* sbuf;
-    double* rbuf;
-    // TODO start: implement halo exchange
+  int bot = 0;
+  int top = field.temperature.nx + 1;
 
-    // You can utilize the data() method of the Matrix class to obtain pointer
-    // to element, e.g. field.temperature.data(i, j)
+  int dombot = bot + 1;
+  int domtop = top - 1;
 
-    // Send to up, receive from down
+  // TODO start: implement halo exchange
 
-    // Send to down, receive from up
+  // You can utilize the data() method of the Matrix class to obtain pointer
+  // to element, e.g. field.temperature.data(i, j)
+  // Send to up, receive from down
+  double *sbuf = field.temperature.data(domtop, 0);
+  double *rbuf = field.temperature.data(bot, 0);
+  if (parallel.rank % 2 == 0)
+  {
+    MPI_Send(sbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
+    MPI_Recv(rbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
+  }
+  else
+  {
+    MPI_Recv(rbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
+    MPI_Send(sbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
+  }
 
+  // Send to down, receive from up
+  sbuf = field.temperature.data(dombot, 0);
+  rbuf = field.temperature.data(top, 0);
+  if (parallel.rank % 2 == 0)
+  {
+    MPI_Send(sbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
+    MPI_Recv(rbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
+  }
+  else
+  {
+    MPI_Recv(rbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
+    MPI_Send(sbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
+  }
 
-    // TODO end
+  // TODO end
 }
 
 // Update the temperature values using five-point stencil */
-void evolve(Field& curr, const Field& prev, const double a, const double dt)
+void evolve(Field &curr, const Field &prev, const double a, const double dt)
 {
 
   // Compilers do not necessarily optimize division to multiplication, so make it explicit
@@ -34,13 +61,11 @@ void evolve(Field& curr, const Field& prev, const double a, const double dt)
   // Determine the temperature field at next time step
   // As we have fixed boundary conditions, the outermost gridpoints
   // are not updated.
-  for (int i = 1; i < curr.nx + 1; i++) {
-    for (int j = 1; j < curr.ny + 1; j++) {
-            curr(i, j) = prev(i, j) + a * dt * (
-	       ( prev(i + 1, j) - 2.0 * prev(i, j) + prev(i - 1, j) ) * inv_dx2 +
-	       ( prev(i, j + 1) - 2.0 * prev(i, j) + prev(i, j - 1) ) * inv_dy2
-               );
+  for (int i = 1; i < curr.nx + 1; i++)
+  {
+    for (int j = 1; j < curr.ny + 1; j++)
+    {
+      curr(i, j) = prev(i, j) + a * dt * ((prev(i + 1, j) - 2.0 * prev(i, j) + prev(i - 1, j)) * inv_dx2 + (prev(i, j + 1) - 2.0 * prev(i, j) + prev(i, j - 1)) * inv_dy2);
     }
   }
-
 }
