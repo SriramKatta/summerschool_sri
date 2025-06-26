@@ -7,8 +7,8 @@
 // Exchange the boundary values
 void exchange(Field &field, const ParallelData parallel)
 {
-  MPI_Status status[2];
-
+  MPI_Request req[4];
+  MPI_Status status[4];
   int top = 0;
   int bot = field.nx + 1;
 
@@ -22,16 +22,16 @@ void exchange(Field &field, const ParallelData parallel)
   // Send to up, receive from down
   double *sbuf = field.temperature.data(domtop, 0);
   double *rbuf = field.temperature.data(bot, 0);
-  MPI_Sendrecv(sbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 0,
-                 rbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
+    MPI_Isend(sbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD, &req[0]);
+    MPI_Irecv(rbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &req[1]);
   
   // Send to down, receive from up
-  sbuf = field.temperature.data(dombot, 0);
-  rbuf = field.temperature.data(top, 0);
-  MPI_Sendrecv(sbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 1, 
-             rbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 1, MPI_COMM_WORLD, &status[0]);
+  double *sbuf2 = field.temperature.data(dombot, 0);
+  double *rbuf2 = field.temperature.data(top, 0);
+  MPI_Isend(sbuf2, field.ny + 2, MPI_DOUBLE, parallel.ndown, 1, MPI_COMM_WORLD, &req[2]);
+  MPI_Irecv(rbuf2, field.ny + 2, MPI_DOUBLE, parallel.nup, 1, MPI_COMM_WORLD, &req[3]);
   
-
+  MPI_Waitall(4,req, status);
 
   // TODO end
 }
