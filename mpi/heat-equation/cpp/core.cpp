@@ -9,11 +9,11 @@ void exchange(Field &field, const ParallelData parallel)
 {
   MPI_Status status[2];
 
-  int bot = 0;
-  int top = field.temperature.nx + 1;
+  int top = 0;
+  int bot = field.temperature.nx + 1;
 
-  int dombot = bot + 1;
-  int domtop = top - 1;
+  int dombot = bot - 1;
+  int domtop = top + 1;
 
   // TODO start: implement halo exchange
 
@@ -24,13 +24,13 @@ void exchange(Field &field, const ParallelData parallel)
   double *rbuf = field.temperature.data(top, 0);
   if (parallel.rank % 2 == 0)
   {
-    MPI_Send(sbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
-    MPI_Recv(rbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
+    MPI_Send(sbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
+    MPI_Recv(rbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
   }
   else
   {
-    MPI_Recv(rbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
-    MPI_Send(sbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
+    MPI_Recv(rbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
+    MPI_Send(sbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
   }
 
   // Send to down, receive from up
@@ -38,13 +38,13 @@ void exchange(Field &field, const ParallelData parallel)
   rbuf = field.temperature.data(bot, 0);
   if (parallel.rank % 2 == 0)
   {
-    MPI_Send(sbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
-    MPI_Recv(rbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
+    MPI_Send(sbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
+    MPI_Recv(rbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
   }
   else
   {
-    MPI_Recv(rbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
-    MPI_Send(sbuf, field.temperature.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
+    MPI_Recv(rbuf, field.ny + 2, MPI_DOUBLE, parallel.ndown, 0, MPI_COMM_WORLD, &status[0]);
+    MPI_Send(sbuf, field.ny + 2, MPI_DOUBLE, parallel.nup, 0, MPI_COMM_WORLD);
   }
 
   // TODO end
