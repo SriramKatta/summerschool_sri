@@ -10,7 +10,7 @@ void exchange(Field &field, const ParallelData parallel)
   MPI_Status status[2];
 
   int bot = 0;
-  int top = field.temperature.nx - 1;
+  int top = field.temperature.nx + 1;
 
   int dombot = bot + 1;
   int domtop = top - 1;
